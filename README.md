@@ -1,7 +1,5 @@
 # 🚀 AI-Powered Code Review Assistant
 
-![AI Review Output](ai-review-output.png)
-
 ## 📌 Project Overview
 
 The **AI Code Review Assistant** automates **GitHub PR code analysis** using **FastAPI**, **Mistral (via Ollama)**, and **GitHub Actions**.  
@@ -34,4 +32,7 @@ It fetches PR diffs, runs them through an **AI model (Mistral)**, and posts **AI
 4️⃣ The **PR code is analyzed by Mistral (via Ollama)**.  
 5️⃣ AI-generated **feedback is posted as a comment** in the PR.  
 6️⃣ Developers receive **real-time AI-driven code suggestions!**  
+
+## 🚀 **Sample Output**
+![AI Review Output](ai-review-output.png)
 
