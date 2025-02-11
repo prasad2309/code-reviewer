@@ -14,8 +14,9 @@ jobs:
       - name: Run AI Code Review
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}  # Use Secret Here
+          NGROK_URL: ${{ secrets.NGROK_URL }}
         run: |
-          curl -X POST "https://f33c-2600-8800-11c2-5d00-d5b2-c648-9f14-c6a.ngrok-free.app" \
+          curl -X POST "$NGROK_URL/review" \
           -H "Content-Type: application/json" \
           -H "Authorization: token $TOKEN_GITHUB" \
           -d '{"repo": "${{ github.repository }}", "pr": "${{ github.event.pull_request.number }}"}'
