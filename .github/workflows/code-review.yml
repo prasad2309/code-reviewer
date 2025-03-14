@@ -18,5 +18,5 @@ jobs:
         run: |
           curl -X POST "$NGROK_URL/review" \
           -H "Content-Type: application/json" \
-          -H "Authorization: token $TOKEN_GITHUB" \
+          -H "Authorization: token $GITHUB_TOKEN" \
           -d '{"repo": "${{ github.repository }}", "pr": "${{ github.event.pull_request.number }}"}'
