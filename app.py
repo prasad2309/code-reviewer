@@ -2,8 +2,9 @@ import os
 import requests
 import subprocess
 from fastapi import FastAPI, Request
+from dotenv import load_dotenv
 
-# Load GitHub Token from environment variables
+load_dotenv()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 if not GITHUB_TOKEN:
@@ -18,7 +19,7 @@ def get_pr_diff(repo, pr_number):
     
     try:
         response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Raise an error for bad status codes
+        response.raise_for_status()
 
         files = response.json()
         diffs = ""
@@ -27,45 +28,43 @@ def get_pr_diff(repo, pr_number):
             patch = file.get("patch", "")  # Some files may not have a patch
             diffs += f"\nFile: {filename}\nChanges:\n{patch}\n"
 
-        if not diffs:
-            return "No code changes detected."
-
-        return diffs
+        return diffs if diffs else "No code changes detected."
     except requests.exceptions.RequestException as e:
         return f"❌ Error fetching PR diff: {str(e)}"
 
-def analyze_code_with_mistral(code_diff):
-    """Send the PR diff to Mistral (via Ollama) for review."""
+def analyze_code_with_codellama(code_diff):
+    """Send the PR diff to Code Llama (via Ollama) for review."""
     if not code_diff or code_diff == "No code changes detected.":
         return "⚠ No code changes detected. No review needed."
 
     prompt = f"""
-    You are an AI code reviewer. Review the following code changes for best practices, potential bugs, and optimizations.
+    You are an AI code reviewer specialized in detecting bugs, security issues, and best practices.
+    Analyze the following code changes and provide feedback as a numbered list:
 
     {code_diff}
 
-    Provide detailed feedback as a numbered list.
+    Keep feedback concise and actionable.
     """
 
     try:
         process = subprocess.run(
-            ["ollama", "run", "mistral", prompt],
+            ["ollama", "run", "codellama:7b", prompt],
             capture_output=True,
             text=True,
-            timeout=60  # Ensure it doesn't hang indefinitely
+            timeout=60
         )
 
         if process.returncode != 0:
-            return f"❌ Error running Mistral: {process.stderr}"
+            return f"❌ Error running Code Llama: {process.stderr}"
 
         return process.stdout.strip()
     except Exception as e:
-        return f"❌ Error analyzing code with Mistral: {str(e)}"
+        return f"❌ Error analyzing code with Code Llama: {str(e)}"
 
 def post_review_comment(repo, pr_number, feedback):
     """Post AI-generated feedback as a comment on the GitHub PR."""
     if "❌" in feedback or "⚠" in feedback:
-        return feedback  # Don't post comments if there was an error
+        return feedback  # Avoid posting if there was an error
 
     url = f"https://api.github.com/repos/{repo}/issues/{pr_number}/comments"
     headers = {
@@ -95,9 +94,11 @@ async def review_pr(request: Request):
 
     # Fetch PR code changes
     code_diff = get_pr_diff(repo, pr_number)
+    print(code_diff)
 
-    # Analyze with Mistral via Ollama
-    feedback = analyze_code_with_mistral(code_diff)
+    # Analyze with Code Llama via Ollama
+    feedback = analyze_code_with_codellama(code_diff)
+    print(feedback)
 
     # Post AI feedback to GitHub PR
     result = post_review_comment(repo, pr_number, feedback)
