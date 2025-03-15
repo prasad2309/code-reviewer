@@ -29,7 +29,7 @@ It fetches PR diffs, runs them through an **AI model (Code Llama 7B)**, and post
 1️⃣ A **Pull Request (PR) is created/updated** in GitHub.  
 2️⃣ **GitHub Actions triggers the FastAPI backend**.  
 3️⃣ **FastAPI fetches the PR diff** using **GitHub API**.  
-4️⃣ The **PR code is analyzed by Mistral (via Ollama)**.  
+4️⃣ The **PR code is analyzed by Code Llama 7B (via Ollama)**.  
 5️⃣ AI-generated **feedback is posted as a comment** in the PR.  
 6️⃣ Developers receive **real-time AI-driven code suggestions!**  
 
